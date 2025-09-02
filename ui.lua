@@ -1435,7 +1435,7 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
     ScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     ScrollingFrame.BackgroundTransparency = 1
     ScrollingFrame.BorderSizePixel = 0
-    ScrollingFrame.ScrollBarThickness = 4
+    ScrollingFrame.ScrollBarThickness = 6
     ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
     ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
     ScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -1473,12 +1473,9 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
     DropdownAsset.Title.Text = Dropdown.Name
     DropdownAsset.Title.Visible = not Dropdown.HideName
 
-    -- Enhanced dropdown toggle with mobile support
-    local function ToggleDropdown()
-        if not OptionContainerAsset.Visible and ScrollingFrame.ListLayout.AbsoluteContentSize.Y ~= 0 then
-            OptionContainerAsset.Visible = true
-            
-            -- Position the dropdown container
+    -- Track UI position to keep dropdown properly positioned
+    local function UpdateDropdownPosition()
+        if OptionContainerAsset.Visible then
             local dropdownPosition = UDim2.fromOffset(
                 DropdownAsset.Background.AbsolutePosition.X + 1,
                 DropdownAsset.Background.AbsolutePosition.Y + DropdownAsset.Background.AbsoluteSize.Y + 2
@@ -1498,6 +1495,14 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
             -- Update scrolling frame size
             ScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
             ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
+        end
+    end
+
+    -- Enhanced dropdown toggle with mobile support
+    local function ToggleDropdown()
+        if not OptionContainerAsset.Visible and ScrollingFrame.ListLayout.AbsoluteContentSize.Y ~= 0 then
+            OptionContainerAsset.Visible = true
+            UpdateDropdownPosition()
             
             -- Mobile optimization: add touch close area
             if UserInputService.TouchEnabled then
@@ -1576,7 +1581,12 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
     
     ScrollingFrame.ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         ScrollingFrame.CanvasSize = UDim2.fromOffset(0, ScrollingFrame.ListLayout.AbsoluteContentSize.Y + 4)
+        UpdateDropdownPosition()
     end)
+
+    -- Update dropdown position when window moves
+    Window:GetPropertyChangedSignal("Position"):Connect(UpdateDropdownPosition)
+    Window:GetPropertyChangedSignal("Size"):Connect(UpdateDropdownPosition)
 
     local function RefreshSelected()
         table.clear(Dropdown.Internal.Value)
