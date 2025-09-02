@@ -1435,11 +1435,11 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
     ScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
     ScrollingFrame.BackgroundTransparency = 1
     ScrollingFrame.BorderSizePixel = 0
-    ScrollingFrame.ScrollBarThickness = 6
-    ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
-    ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    ScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+    ScrollingFrame.ScrollBarThickness = 8  -- Increased thickness for better visibility
+    ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(120, 120, 120)  -- Brighter color
+    ScrollingFrame.ScrollBarImageTransparency = 0.5  -- Slightly transparent
     ScrollingFrame.ScrollingEnabled = true
+    ScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
     ScrollingFrame.ElasticBehavior = Enum.ElasticBehavior.Always
     ScrollingFrame.Visible = true
     
@@ -1495,6 +1495,11 @@ function Assets:Dropdown(Parent,ScreenAsset,Window,Dropdown)
             -- Update scrolling frame size
             ScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
             ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
+            
+            -- Show scrollbar only when needed (for PC)
+            if not UserInputService.TouchEnabled then
+                ScrollingFrame.ScrollBarThickness = contentHeight > maxHeight and 8 or 0
+            end
         end
     end
 
